@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import Header from "@/components/ui/Header";
 
 const { width } = Dimensions.get("window");
 
@@ -32,7 +35,17 @@ const FINDINGS_DATA: FindingItem[] = [
     iconType: "feather",
     iconColor: "#FF453A",
     title: "Exposed Emails",
-    subtitle: "Personal email found in 1 public database.",
+    subtitle: "Your personal email was found in 1 public database.",
+    badgeText: "HIGH",
+    badgeType: "high",
+  },
+  {
+    id: "ssn-exposure",
+    iconName: "shield",
+    iconType: "feather",
+    iconColor: "#FF453A",
+    title: "Social Security Number",
+    subtitle: "Your SSN may have been exposed in a recent data breach.",
     badgeText: "HIGH",
     badgeType: "high",
   },
@@ -42,7 +55,7 @@ const FINDINGS_DATA: FindingItem[] = [
     iconType: "feather",
     iconColor: "#FFD60A",
     title: "Public Addresses",
-    subtitle: "Primary and previous addresses listed on 4 sites.",
+    subtitle: "Your current and previous addresses were listed on 4 sites.",
     badgeText: "MEDIUM",
     badgeType: "medium",
   },
@@ -52,7 +65,7 @@ const FINDINGS_DATA: FindingItem[] = [
     iconType: "feather",
     iconColor: "#FFD60A",
     title: "Phone Number Exposure",
-    subtitle: "Mobile number associated with public records.",
+    subtitle: "Your mobile number was linked to public records.",
     badgeText: "MEDIUM",
     badgeType: "medium",
   },
@@ -61,8 +74,8 @@ const FINDINGS_DATA: FindingItem[] = [
     iconName: "users",
     iconType: "feather",
     iconColor: "#30D158",
-    title: "Public Relative Information",
-    subtitle: "Contact details for immediate family members found.",
+    title: "Family Member Information",
+    subtitle: "Contact details for immediate family members were found online.",
     badgeText: "LOW",
     badgeType: "low",
   },
@@ -71,8 +84,8 @@ const FINDINGS_DATA: FindingItem[] = [
     iconName: "rss",
     iconType: "feather",
     iconColor: "#FF453A",
-    title: "Breach History",
-    subtitle: "1 credential leak detected in recent database breach.",
+    title: "Data Breach History",
+    subtitle: "1 set of login credential was found in a recent data breach.",
     badgeText: "HIGH",
     badgeType: "high",
   },
@@ -82,7 +95,7 @@ const FINDINGS_DATA: FindingItem[] = [
     iconType: "feather",
     iconColor: "#FF453A",
     title: "Broker Profiles",
-    subtitle: "Aggregated profiles found on major data brokers.",
+    subtitle: "Profiles linked to your information were found on major data broker sites.",
     badgeText: "HIGH",
     badgeType: "high",
   },
@@ -92,7 +105,7 @@ const FINDINGS_DATA: FindingItem[] = [
     iconType: "feather",
     iconColor: "#FF453A",
     title: "Risk Assessment: Critical",
-    subtitle: "Immediate action recommended to secure identity.",
+    subtitle: "Recommended action to secure your identity.",
     badgeText: "ACTION REQUIRED",
     badgeType: "action",
   },
@@ -147,7 +160,7 @@ export default function ExposureReportScreen() {
     return (
       <Animated.View
         key={item.id}
-        entering={FadeInDown.delay(100 + index * 50).duration(500)}
+        entering={FadeInDown.delay(100 + index * 40).duration(500)}
       >
         <TouchableOpacity
           activeOpacity={0.8}
@@ -187,16 +200,24 @@ export default function ExposureReportScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top > 0 ? insets.top + 8 : 16 }]}>
-        <View style={styles.headerLeft}>
-          <Feather name="file-text" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-          <Text style={styles.headerTitle}>EXPOSURE REPORT</Text>
-        </View>
-      </View>
+      {/* Header same as Home */}
+      <Header
+        showBorder={true}
+        rightElement={
+          <TouchableOpacity
+            style={styles.avatarButton}
+            activeOpacity={0.7}
+          >
+            <Image
+              source="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
+        }
+      />
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Title Section */}
@@ -205,7 +226,7 @@ export default function ExposureReportScreen() {
           <Text style={styles.subtitle}>Generated today • Jan 24, 2024</Text>
         </Animated.View>
 
-        {/* High Risk Live Analysis Card */}
+        {/* Live Analysis Card */}
         <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.liveAnalysisCard}>
           {/* Watermark Shield background */}
           <View style={styles.watermarkContainer}>
@@ -220,36 +241,16 @@ export default function ExposureReportScreen() {
             <Text style={styles.liveAnalysisText}>LIVE ANALYSIS</Text>
           </View>
 
-          <Text style={styles.liveTitle}>7 exposure findings detected</Text>
+          <Text style={styles.liveTitle}>7 exposures detected</Text>
           <Text style={styles.liveDesc}>
-            Your digital footprint is currently visible to malicious actors and data aggregators.
+            Your digital fingerprint is currently visible to malicious actors and data aggregators.
           </Text>
         </Animated.View>
 
         {/* Findings List */}
         <View style={styles.findingsList}>
           {FINDINGS_DATA.map((item, index) => renderFindingCard(item, index))}
-        </View>
-
-        {/* Action Buttons */}
-        <Animated.View entering={FadeInDown.delay(500).duration(600)} style={styles.buttonContainer}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={styles.primaryButton}
-            onPress={() => router.push("/(report)/remove" as any)}
-          >
-            <Text style={styles.primaryButtonText}>SEND REMOVAL REQUEST</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.secondaryButton}
-            onPress={() => router.push("/government" as any)}
-          >
-            <Feather name="file-text" size={14} color="#FFFFFF" style={{ marginRight: 8 }} />
-            <Text style={styles.secondaryButtonText}>Prepare FTC / IC3 Report</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        </View> 
       </ScrollView>
     </View>
   );
@@ -260,73 +261,65 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000000",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#000000",
-    paddingBottom: 16,
-    width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#1C1C1E",
+  avatarButton: {
+    paddingLeft: 16,
+    paddingVertical: 4,
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 1.5,
-    fontFamily: "System",
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    borderWidth: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 20,
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   mainTitle: {
     color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
     fontFamily: "System",
     marginBottom: 4,
+    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#8E8E93",
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "System",
+    fontWeight: "500",
   },
   liveAnalysisCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 69, 58, 0.25)",
-    borderWidth: 1.2,
-    borderRadius: 16,
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderWidth: 1,
+    borderRadius: 20,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 20,
     position: "relative",
     overflow: "hidden",
   },
   watermarkContainer: {
     position: "absolute",
-    right: 8,
-    top: 8,
+    right: 16,
+    bottom: 16,
+    opacity: 0.05,
   },
   liveHeader: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   highRiskBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E63946",
-    borderRadius: 20,
+    backgroundColor: "#FF3B30",
+    borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
@@ -341,56 +334,57 @@ const styles = StyleSheet.create({
   },
   liveAnalysisText: {
     color: "#8E8E93",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.5,
+    fontSize: 10.5,
+    fontWeight: "800",
+    letterSpacing: 1.2,
     fontFamily: "System",
   },
   liveTitle: {
     color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 22,
+    fontWeight: "800",
     fontFamily: "System",
     marginBottom: 8,
   },
   liveDesc: {
-    color: "#8E8E93",
+    color: "#A0A0A5",
     fontSize: 13.5,
     lineHeight: 19,
     fontFamily: "System",
+    fontWeight: "500",
   },
   findingsList: {
+    width: "100%",
     marginBottom: 16,
   },
   findingCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(22, 22, 26, 0.45)",
+    borderColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 12,
+    paddingVertical: 14,
+    marginBottom: 10,
+    height: 76,
   },
   criticalCard: {
-    borderLeftWidth: 3.5,
+    borderLeftWidth: 3,
     borderLeftColor: "#FF3B30",
   },
   iconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: "#1C1C1E",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
   },
   cardContent: {
     flex: 1,
-    marginRight: 8,
+    justifyContent: "center",
   },
   cardHeaderRow: {
     flexDirection: "row",
@@ -401,92 +395,89 @@ const styles = StyleSheet.create({
   findingTitle: {
     color: "#FFFFFF",
     fontSize: 14.5,
-    fontWeight: "600",
+    fontWeight: "800",
     fontFamily: "System",
     flex: 1,
-    marginRight: 6,
+    marginRight: 8,
   },
   findingSubtitle: {
     color: "#8E8E93",
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 12.5,
     fontFamily: "System",
+    fontWeight: "500",
   },
   chevron: {
-    marginLeft: 4,
+    marginLeft: 8,
   },
   badge: {
-    borderRadius: 4,
+    borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
+  badgeHigh: {
+    backgroundColor: "rgba(255, 69, 58, 0.12)",
+  },
+  badgeMedium: {
+    backgroundColor: "rgba(255, 214, 10, 0.12)",
+  },
+  badgeLow: {
+    backgroundColor: "rgba(48, 209, 88, 0.12)",
+  },
+  badgeAction: {
+    backgroundColor: "#FF3B30",
+  },
   badgeText: {
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: "800",
     fontFamily: "System",
     letterSpacing: 0.5,
   },
-  badgeHigh: {
-    backgroundColor: "rgba(255, 69, 58, 0.15)",
-  },
   badgeTextHigh: {
     color: "#FF453A",
-  },
-  badgeMedium: {
-    backgroundColor: "rgba(255, 214, 10, 0.15)",
   },
   badgeTextMedium: {
     color: "#FFD60A",
   },
-  badgeLow: {
-    backgroundColor: "rgba(48, 209, 88, 0.15)",
-  },
   badgeTextLow: {
     color: "#30D158",
   },
-  badgeAction: {
-    backgroundColor: "#FF3B30",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
   badgeTextAction: {
     color: "#FFFFFF",
-    fontWeight: "900",
-    fontSize: 8,
   },
   buttonContainer: {
-    marginTop: 16,
-    marginBottom: 12,
+    width: "100%",
+    marginTop: 10,
+    marginBottom: 10,
   },
   primaryButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
     marginBottom: 12,
   },
   primaryButtonText: {
     color: "#000000",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "800",
     letterSpacing: 0.5,
   },
   secondaryButton: {
-    flexDirection: "row",
     backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
+    borderColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderRadius: 27,
+    height: 54,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
   secondaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

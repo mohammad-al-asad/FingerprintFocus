@@ -9,6 +9,7 @@ import {
   Dimensions,
   Alert,
   Linking,
+  Modal,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,12 +18,19 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const MISUSE_OPTIONS = [
-  "Credit card or bank account fraud",
-  "Tax evasion or government benefit fraud",
-  "Medical services identity fraud",
-  "Employment or utility account fraud",
-  "Other identity misuse",
+interface MisuseOption {
+  label: string;
+  icon: string;
+  iconType: "feather" | "material-community";
+}
+
+const MISUSE_OPTIONS: MisuseOption[] = [
+  { label: "Credit card or bank account fraud", icon: "credit-card", iconType: "feather" },
+  { label: "Tax fraud", icon: "wallet-outline", iconType: "material-community" },
+  { label: "Employment or tax-related fraud", icon: "briefcase", iconType: "feather" },
+  { label: "Utility or phone fraud", icon: "phone", iconType: "feather" },
+  { label: "Loan or real estate fraud", icon: "home", iconType: "feather" },
+  { label: "Government benefits fraud", icon: "bank-outline", iconType: "material-community" },
 ];
 
 export default function PrepareReportInfoScreen() {
@@ -41,6 +49,7 @@ export default function PrepareReportInfoScreen() {
   const [streetAddress, setStreetAddress] = useState("");
   const [incidentDetails, setIncidentDetails] = useState("");
   const [suspectedMisuse, setSuspectedMisuse] = useState("Credit card or bank account fraud");
+  const [tempMisuse, setTempMisuse] = useState("Credit card or bank account fraud");
   const [showMisuseDropdown, setShowMisuseDropdown] = useState(false);
 
   // Accounts affected tags
@@ -115,22 +124,15 @@ export default function PrepareReportInfoScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top > 0 ? insets.top + 8 : 16 }]}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-            activeOpacity={0.7}
-          >
-            <Feather name="chevron-left" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>PRIVACERA</Text>
-        </View>
         <TouchableOpacity
-          style={styles.profileButton}
+          onPress={() => router.back()}
+          style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Feather name="user" size={20} color="#FFFFFF" />
+          <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>PREPARE REPORT</Text>
+        <View style={{ width: 56 }} />
       </View>
 
       <ScrollView
@@ -246,29 +248,77 @@ export default function PrepareReportInfoScreen() {
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.dropdownButton}
-            onPress={() => setShowMisuseDropdown((prev) => !prev)}
+            onPress={() => {
+              setTempMisuse(suspectedMisuse);
+              setShowMisuseDropdown(true);
+            }}
           >
             <Text style={styles.dropdownButtonText}>{suspectedMisuse}</Text>
-            <Feather name={showMisuseDropdown ? "chevron-up" : "chevron-down"} size={16} color="#8E8E93" />
+            <Feather name="chevron-down" size={16} color="#8E8E93" />
           </TouchableOpacity>
 
-          {showMisuseDropdown && (
-            <View style={styles.dropdownList}>
-              {MISUSE_OPTIONS.map((opt) => (
+          {/* Misuse Category Modal */}
+          <Modal
+            visible={showMisuseDropdown}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setShowMisuseDropdown(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <Animated.View entering={FadeInDown.duration(300)} style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Select Misuse Category</Text>
+                <Text style={styles.modalSubtitle}>
+                  Identify the primary nature of the suspected identity misuse to prioritize your protection sequence.
+                </Text>
+
+                <ScrollView style={styles.modalOptionsContainer} showsVerticalScrollIndicator={false}>
+                  {MISUSE_OPTIONS.map((opt) => {
+                    const isSelected = tempMisuse === opt.label;
+                    const IconComponent = opt.iconType === "feather" ? Feather : MaterialCommunityIcons;
+
+                    return (
+                      <TouchableOpacity
+                        key={opt.label}
+                        activeOpacity={0.8}
+                        style={[
+                          styles.modalOptionRow,
+                          isSelected && styles.modalOptionRowActive,
+                        ]}
+                        onPress={() => setTempMisuse(opt.label)}
+                      >
+                        <View style={styles.optionLeft}>
+                          <View style={[styles.radioCircle, isSelected && styles.radioCircleActive]}>
+                            {isSelected && <View style={styles.radioDot} />}
+                          </View>
+                          <Text style={styles.optionLabelText}>{opt.label}</Text>
+                        </View>
+                        <IconComponent name={opt.icon as any} size={18} color="#8E8E93" />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+
                 <TouchableOpacity
-                  key={opt}
-                  style={styles.dropdownItem}
+                  activeOpacity={0.9}
+                  style={styles.modalConfirmButton}
                   onPress={() => {
-                    setSuspectedMisuse(opt);
+                    setSuspectedMisuse(tempMisuse);
                     setShowMisuseDropdown(false);
                   }}
-                  activeOpacity={0.7}
                 >
-                  <Text style={styles.dropdownItemText}>{opt}</Text>
+                  <Text style={styles.modalConfirmButtonText}>Confirm Selection</Text>
                 </TouchableOpacity>
-              ))}
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.modalCancelButton}
+                  onPress={() => setShowMisuseDropdown(false)}
+                >
+                  <Text style={styles.modalCancelButtonText}>CANCEL</Text>
+                </TouchableOpacity>
+              </Animated.View>
             </View>
-          )}
+          </Modal>
 
           {/* Accounts Affected */}
           <Text style={styles.fieldLabel}>ACCOUNTS AFFECTED?</Text>
@@ -430,11 +480,6 @@ export default function PrepareReportInfoScreen() {
           </View>
         </Animated.View>
 
-        {/* Subtle Watermark Fingerprint at bottom */}
-        <Animated.View entering={FadeInDown.delay(250).duration(600)} style={styles.watermarkWrapper}>
-          <MaterialCommunityIcons name="fingerprint" size={120} color="rgba(255, 255, 255, 0.02)" />
-        </Animated.View>
-
         {/* Bottom buttons */}
         <Animated.View entering={FadeInDown.delay(300).duration(600)} style={styles.buttonContainer}>
           <TouchableOpacity
@@ -475,13 +520,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#1C1C1E",
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   backButton: {
-    paddingLeft: 16,
-    paddingRight: 12,
+    paddingHorizontal: 16,
     paddingVertical: 4,
   },
   headerTitle: {
@@ -490,10 +530,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1.5,
     fontFamily: "System",
-  },
-  profileButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 4,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -771,10 +807,7 @@ const styles = StyleSheet.create({
     fontFamily: "System",
   },
 
-  watermarkWrapper: {
-    alignItems: "center",
-    marginVertical: 16,
-  },
+
 
   buttonContainer: {
     marginTop: 8,
@@ -808,6 +841,115 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 13,
     fontWeight: "700",
+    fontFamily: "System",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#121214",
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderWidth: 1,
+    borderRadius: 24,
+    padding: 24,
+    width: "100%",
+    maxHeight: "85%",
+  },
+  modalTitle: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "800",
+    fontFamily: "System",
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    color: "#8E8E93",
+    fontSize: 13.5,
+    lineHeight: 19,
+    fontFamily: "System",
+    marginBottom: 20,
+  },
+  modalOptionsContainer: {
+    marginBottom: 24,
+  },
+  modalOptionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "rgba(255, 255, 255, 0.02)",
+    borderColor: "rgba(255, 255, 255, 0.06)",
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 56,
+    marginBottom: 10,
+  },
+  modalOptionRowActive: {
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+  },
+  optionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 12,
+  },
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  radioCircleActive: {
+    borderColor: "#FFFFFF",
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FFFFFF",
+  },
+  optionLabelText: {
+    color: "#FFFFFF",
+    fontSize: 14.5,
+    fontWeight: "600",
+    fontFamily: "System",
+    flex: 1,
+  },
+  modalConfirmButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 27,
+    height: 54,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    width: "100%",
+  },
+  modalConfirmButtonText: {
+    color: "#000000",
+    fontSize: 14.5,
+    fontWeight: "800",
+    fontFamily: "System",
+  },
+  modalCancelButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    width: "100%",
+  },
+  modalCancelButtonText: {
+    color: "#8E8E93",
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.2,
     fontFamily: "System",
   },
 });

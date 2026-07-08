@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeInDown, FadeInUp, Layout } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, FadeInUp } from "react-native-reanimated";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
@@ -27,9 +27,12 @@ export default function RemoveRequestScreen() {
     }
   };
 
-  const handleBackToRequests = () => {
-    // Go back to the main report screen or pop back
-    router.replace("/report" as any);
+  const handleViewStatus = () => {
+    router.replace("/(tabs)/removals" as any);
+  };
+
+  const handleBackToResult = () => {
+    router.replace("/(tabs)/result" as any);
   };
 
   if (isSubmitted) {
@@ -40,7 +43,7 @@ export default function RemoveRequestScreen() {
             styles.successScrollContent,
             {
               paddingTop: insets.top > 0 ? insets.top + 40 : 60,
-              paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40,
+              paddingBottom: insets.bottom + 24,
             },
           ]}
           showsVerticalScrollIndicator={false}
@@ -77,12 +80,12 @@ export default function RemoveRequestScreen() {
 
           {/* Bottom Success Buttons */}
           <Animated.View entering={FadeInDown.delay(350).duration(600)} style={styles.successButtonContainer}>
-            <TouchableOpacity activeOpacity={0.9} style={styles.primaryButton} onPress={handleBackToRequests}>
-              <Text style={styles.primaryButtonText}>View Request Status</Text>
+            <TouchableOpacity activeOpacity={0.9} style={styles.successPrimaryButton} onPress={handleViewStatus}>
+              <Text style={styles.successPrimaryButtonText}>View Request Status</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.8} style={styles.secondaryButton} onPress={handleBackToRequests}>
-              <Text style={styles.secondaryButtonText}>Back to Requests</Text>
+            <TouchableOpacity activeOpacity={0.8} style={styles.successSecondaryButton} onPress={handleBackToResult}>
+              <Text style={styles.successSecondaryButtonText}>Back to Result</Text>
             </TouchableOpacity>
           </Animated.View>
         </ScrollView>
@@ -102,11 +105,14 @@ export default function RemoveRequestScreen() {
           <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>REMOVE REQUEST</Text>
-        <View style={styles.headerRightPlaceholder} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 24 }
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Badge & Title */}
@@ -114,9 +120,9 @@ export default function RemoveRequestScreen() {
           <View style={styles.externalSourceBadge}>
             <Text style={styles.externalSourceText}>EXTERNAL SOURCE</Text>
           </View>
-          <Text style={styles.mainTitle}>Remove request</Text>
+          <Text style={styles.mainTitle}>Removal Request</Text>
           <Text style={styles.subtitle}>
-            We'll help you request removal of exposed information from this source.
+            We'll help you request removal of exposed information from this site.
           </Text>
         </Animated.View>
 
@@ -151,7 +157,7 @@ export default function RemoveRequestScreen() {
         <Animated.View entering={FadeInDown.delay(150).duration(600)} style={styles.warningBox}>
           <Feather name="alert-circle" size={18} color="#FFD60A" style={styles.warningIcon} />
           <Text style={styles.warningText}>
-            Some sites require verification before processing a remove request. You may receive an email or SMS at the contact details provided.
+            Some sites require verification before processing a removal request. You may receive an email or SMS at the contact details provided.
           </Text>
         </Animated.View>
 
@@ -159,13 +165,13 @@ export default function RemoveRequestScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.checkboxContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
-            style={styles.checkboxSquare}
+            style={[styles.checkboxSquare, isConfirmed && styles.checkboxSquareActive]}
             onPress={() => setIsConfirmed((prev) => !prev)}
           >
-            {isConfirmed && <Feather name="check" size={14} color="#FFFFFF" />}
+            {isConfirmed && <Feather name="check" size={12} color="#000000" />}
           </TouchableOpacity>
           <Text style={styles.checkboxLabel} onPress={() => setIsConfirmed((prev) => !prev)}>
-            I confirm this information belongs to me and I want to start a remove request.
+            I confirm this information belongs to me and I want to start this removal request.
           </Text>
         </Animated.View>
 
@@ -186,7 +192,7 @@ export default function RemoveRequestScreen() {
                 isConfirmed ? styles.submitButtonTextEnabled : styles.submitButtonTextDisabled,
               ]}
             >
-              SUBMIT REMOVE REQUEST
+              SUBMIT REMOVAL REQUEST
             </Text>
           </TouchableOpacity>
 
@@ -215,8 +221,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     paddingBottom: 16,
     width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#1C1C1E",
   },
   backButton: {
     paddingHorizontal: 16,
@@ -229,56 +233,55 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontFamily: "System",
   },
-  headerRightPlaceholder: {
-    width: 56,
-  },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 10,
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   externalSourceBadge: {
     backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderRadius: 8,
-    paddingHorizontal: 8,
+    borderRadius: 12,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     alignSelf: "flex-start",
-    marginBottom: 14,
+    marginBottom: 10,
   },
   externalSourceText: {
     color: "#8E8E93",
-    fontSize: 9.5,
-    fontWeight: "700",
-    letterSpacing: 1,
+    fontSize: 10,
+    fontWeight: "800",
     fontFamily: "System",
+    letterSpacing: 0.5,
   },
   mainTitle: {
     color: "#FFFFFF",
     fontSize: 26,
-    fontWeight: "700",
+    fontWeight: "800",
     fontFamily: "System",
-    marginBottom: 8,
+    marginBottom: 4,
+    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#8E8E93",
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 14.5,
+    lineHeight: 20,
     fontFamily: "System",
+    fontWeight: "500",
   },
   exposedDataCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 18,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
   },
   exposedDataHeader: {
     color: "#8E8E93",
-    fontSize: 10,
-    fontWeight: "700",
+    fontSize: 11,
+    fontWeight: "800",
     letterSpacing: 1.2,
     fontFamily: "System",
     marginBottom: 16,
@@ -287,247 +290,245 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 4,
+    paddingVertical: 12,
   },
   addressDataRow: {
-    paddingVertical: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    paddingVertical: 12,
   },
   dataLabel: {
     color: "#8E8E93",
-    fontSize: 13.5,
+    fontSize: 14,
+    fontWeight: "500",
     fontFamily: "System",
   },
   dataValue: {
     color: "#FFFFFF",
-    fontSize: 13.5,
+    fontSize: 14,
     fontWeight: "600",
     fontFamily: "System",
   },
   addressValueText: {
     color: "#FFFFFF",
-    fontSize: 13.5,
+    fontSize: 14,
     fontWeight: "600",
     fontFamily: "System",
-    marginTop: 6,
+    flex: 1,
+    textAlign: "right",
+    marginLeft: 24,
   },
   exposedDivider: {
     height: 1,
-    backgroundColor: "#1C1C1E",
-    marginVertical: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    width: "100%",
   },
   warningBox: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(255, 214, 10, 0.03)",
+    borderColor: "#FFD60A",
     borderWidth: 1,
-    borderLeftWidth: 3.5,
-    borderLeftColor: "#FFD60A",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   warningIcon: {
-    marginRight: 10,
-    marginTop: 1,
+    marginRight: 12,
+    marginTop: 2,
   },
   warningText: {
     flex: 1,
-    color: "#8E8E93",
-    fontSize: 12.5,
+    color: "#A0A0A5",
+    fontSize: 13,
     lineHeight: 18,
     fontFamily: "System",
+    fontWeight: "500",
   },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
-    paddingHorizontal: 2,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   checkboxSquare: {
     width: 20,
     height: 20,
-    borderRadius: 4,
+    borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: "#3E3E42",
+    borderColor: "#48484A",
     backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
-    marginTop: 1,
+    marginTop: 2,
+  },
+  checkboxSquareActive: {
+    borderColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF",
   },
   checkboxLabel: {
     flex: 1,
-    color: "#8E8E93",
-    fontSize: 13,
-    lineHeight: 18,
+    color: "#A0A0A5",
+    fontSize: 13.5,
+    lineHeight: 19,
     fontFamily: "System",
+    fontWeight: "500",
   },
   buttonContainer: {
-    marginTop: 8,
+    width: "100%",
+    marginBottom: 10,
   },
   submitButton: {
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
     marginBottom: 12,
   },
   submitButtonDisabled: {
-    backgroundColor: "#2C2C2E",
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
   },
   submitButtonEnabled: {
     backgroundColor: "#FFFFFF",
   },
   submitButtonText: {
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    fontSize: 14.5,
+    fontWeight: "800",
   },
   submitButtonTextDisabled: {
-    color: "#8E8E93",
+    color: "rgba(255, 255, 255, 0.35)",
   },
   submitButtonTextEnabled: {
     color: "#000000",
   },
   cancelButton: {
     backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderWidth: 1.5,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
   cancelButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontWeight: "800",
   },
-
-  /* Success State Styles */
   successScrollContent: {
-    paddingHorizontal: 20,
-    alignItems: "center",
+    flexGrow: 1,
     justifyContent: "center",
-    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 24,
   },
   successIconWrapper: {
-    marginBottom: 32,
-    alignItems: "center",
+    marginBottom: 28,
   },
   successOuterCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    borderWidth: 1,
-    borderColor: "rgba(48, 209, 88, 0.25)",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(48, 209, 88, 0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
   successInnerCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderWidth: 1.5,
-    borderColor: "#30D158",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(48, 209, 88, 0.15)",
     justifyContent: "center",
     alignItems: "center",
   },
   successTitle: {
     color: "#FFFFFF",
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: "800",
     fontFamily: "System",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   successSubtitle: {
     color: "#8E8E93",
-    fontSize: 13.5,
-    lineHeight: 19,
-    fontFamily: "System",
+    fontSize: 14.5,
     textAlign: "center",
-    paddingHorizontal: 20,
+    fontFamily: "System",
+    lineHeight: 20,
     marginBottom: 32,
+    paddingHorizontal: 16,
   },
   ticketCard: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderRadius: 20,
+    padding: 16,
     width: "100%",
-    marginBottom: 40,
+    marginBottom: 32,
   },
   ticketLeftInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   ticketIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: "#1C1C1E",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
   },
   ticketLabel: {
     color: "#8E8E93",
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: 9.5,
+    fontWeight: "800",
     letterSpacing: 0.8,
     fontFamily: "System",
-    marginBottom: 2,
   },
   ticketValue: {
     color: "#FFFFFF",
-    fontSize: 13.5,
+    fontSize: 14,
     fontWeight: "700",
     fontFamily: "System",
+    marginTop: 2,
   },
   successButtonContainer: {
     width: "100%",
   },
-  primaryButton: {
+  successPrimaryButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
     marginBottom: 12,
-    width: "100%",
   },
-  primaryButtonText: {
+  successPrimaryButtonText: {
     color: "#000000",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14.5,
+    fontWeight: "800",
   },
-  secondaryButton: {
+  successSecondaryButton: {
     backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderWidth: 1.5,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
-  secondaryButtonText: {
+  successSecondaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

@@ -31,17 +31,20 @@ export default function PublicAddressExposureScreen() {
           <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>ADDRESS EXPOSURE</Text>
-        <View style={styles.headerRightPlaceholder} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 24 }
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Title Section */}
         <Animated.View entering={FadeInUp.delay(50).duration(500)} style={styles.titleSection}>
-          <Text style={styles.mainTitle}>Public Address Exposure</Text>
-          <Text style={styles.subtitle}>Addresses linked to your profile were found online.</Text>
+          <Text style={styles.mainTitle}>Exposed Home Address</Text>
+          <Text style={styles.subtitle}>Your home address was found on public websites.</Text>
         </Animated.View>
 
         {/* Summary Card */}
@@ -60,12 +63,12 @@ export default function PublicAddressExposureScreen() {
 
           <Text style={styles.summaryTitle}>2 address matches detected</Text>
           <Text style={styles.summaryDesc}>
-            Your home address is visible on major data broker sites, increasing the risk of physical privacy breaches.
+            Your home address is visible on major data broker sites, putting your physical privacy and safety at risk.
           </Text>
 
-          {/* Progress bar */}
+          {/* Red Progress Indicator Bar */}
           <View style={styles.progressBarBg}>
-            <View style={[styles.progressBarFill, { width: "70%" }]} />
+            <View style={styles.progressBarFill} />
           </View>
         </Animated.View>
 
@@ -77,7 +80,7 @@ export default function PublicAddressExposureScreen() {
           <View style={styles.sourceCard}>
             <View style={styles.sourceTopRow}>
               <View style={styles.sourceLeftInfo}>
-                <View style={styles.iconBox}>
+                <View style={[styles.iconBox, { backgroundColor: "rgba(255, 255, 255, 0.05)" }]}>
                   <Feather name="share-2" size={18} color="#FFFFFF" />
                 </View>
                 <View>
@@ -102,15 +105,15 @@ export default function PublicAddressExposureScreen() {
               </View>
             </View>
 
-            {/* Address Value Input-like Box */}
+            {/* Masked Address Display Box */}
             <View style={styles.addressBox}>
               <Text style={styles.addressText}>123 P*** Ave, New York, NY</Text>
             </View>
 
             <View style={styles.cardActionRow}>
               <View style={styles.statusContainer}>
-                <Feather name="check-circle" size={13} color="#30D158" style={{ marginRight: 6 }} />
-                <Text style={styles.statusSuccessText}>Remove Supported</Text>
+                <View style={styles.statusDot} />
+                <Text style={styles.statusSuccessText}>Removal Supported</Text>
               </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.viewDetailsButton}>
                 <Text style={styles.viewDetailsText}>VIEW DETAILS</Text>
@@ -122,7 +125,7 @@ export default function PublicAddressExposureScreen() {
           <View style={styles.sourceCard}>
             <View style={styles.sourceTopRow}>
               <View style={styles.sourceLeftInfo}>
-                <View style={styles.iconBox}>
+                <View style={[styles.iconBox, { backgroundColor: "rgba(255, 255, 255, 0.05)" }]}>
                   <MaterialCommunityIcons name="sitemap" size={18} color="#FFFFFF" />
                 </View>
                 <View>
@@ -144,18 +147,18 @@ export default function PublicAddressExposureScreen() {
               </View>
             </View>
 
-            {/* Address Value Input-like Box */}
+            {/* Masked Address Display Box */}
             <View style={styles.addressBox}>
               <Text style={styles.addressText}>456 O*** St, Chicago, IL</Text>
             </View>
 
             <View style={styles.cardActionRow}>
               <View style={styles.statusContainer}>
-                <Feather name="help-circle" size={13} color="#8E8E93" style={{ marginRight: 6 }} />
-                <Text style={styles.statusInfoText}>Manual Guidance</Text>
+                <View style={[styles.statusDot, { backgroundColor: "#8E8E93" }]} />
+                <Text style={[styles.statusSuccessText, { color: "#8E8E93" }]}>Manual Guidance</Text>
               </View>
-              <TouchableOpacity activeOpacity={0.8} style={styles.viewDetailsOutlineButton}>
-                <Text style={styles.viewDetailsOutlineText}>VIEW DETAILS</Text>
+              <TouchableOpacity activeOpacity={0.8} style={[styles.viewDetailsButton, styles.viewDetailsOutline]}>
+                <Text style={[styles.viewDetailsText, styles.viewDetailsOutlineText]}>VIEW DETAILS</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -163,14 +166,12 @@ export default function PublicAddressExposureScreen() {
 
         {/* Privacy Command Card */}
         <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.commandCard}>
-          <View style={styles.commandCardContent}>
-            <Feather name="shield" size={20} color="#FFFFFF" style={styles.commandIcon} />
-            <View style={styles.commandTextContainer}>
-              <Text style={styles.commandTitle}>Privacy Command</Text>
-              <Text style={styles.commandDesc}>
-                Enable automatic removal requests in Settings to let Privacera handle these brokers daily.
-              </Text>
-            </View>
+          <Feather name="shield" size={20} color="#FFFFFF" style={styles.commandIcon} />
+          <View style={styles.commandTextContainer}>
+            <Text style={styles.commandTitle}>Privacy Command</Text>
+            <Text style={styles.commandDesc}>
+              Enable automatic removal requests in Settings to let Fingerprint Focus handle these brokers daily.
+            </Text>
           </View>
         </Animated.View>
 
@@ -181,16 +182,16 @@ export default function PublicAddressExposureScreen() {
             style={styles.primaryButton}
             onPress={() => router.push("/(report)/remove" as any)}
           >
-            <Text style={styles.primaryButtonText}>SEND REMOVAL REQUEST</Text>
+            <Text style={styles.primaryButtonText}>Send Removal Request</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.secondaryButton}
-            onPress={() => router.push("/government" as any)}
+            onPress={() => router.push("/(report)/government" as any)}
           >
             <Feather name="file-text" size={14} color="#FFFFFF" style={{ marginRight: 8 }} />
-            <Text style={styles.secondaryButtonText}>Prepare FTC / IC3 Report</Text>
+            <Text style={styles.secondaryButtonText}>Prepare Identity Theft Report</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -210,8 +211,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     paddingBottom: 16,
     width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#1C1C1E",
   },
   backButton: {
     paddingHorizontal: 16,
@@ -224,33 +223,32 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontFamily: "System",
   },
-  headerRightPlaceholder: {
-    width: 56,
-  },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 10,
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   mainTitle: {
     color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
     fontFamily: "System",
     marginBottom: 4,
+    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#8E8E93",
-    fontSize: 13,
+    fontSize: 14.5,
     fontFamily: "System",
+    fontWeight: "500",
   },
   summaryCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 69, 58, 0.25)",
-    borderWidth: 1.2,
-    borderRadius: 16,
+    backgroundColor: "rgba(255, 69, 58, 0.08)",
+    borderColor: "rgba(255, 69, 58, 0.15)",
+    borderWidth: 1,
+    borderRadius: 20,
     padding: 20,
     marginBottom: 24,
     position: "relative",
@@ -258,22 +256,21 @@ const styles = StyleSheet.create({
   },
   watermarkContainer: {
     position: "absolute",
-    right: 8,
-    top: 8,
+    right: 16,
+    bottom: 16,
+    opacity: 0.04,
   },
   cardHeaderRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    alignItems: "center",
+    marginBottom: 12,
   },
   riskLevelBadge: {
-    backgroundColor: "rgba(255, 69, 58, 0.12)",
+    backgroundColor: "rgba(255, 69, 58, 0.15)",
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderWidth: 0.5,
-    borderColor: "rgba(255, 69, 58, 0.25)",
   },
   riskLevelText: {
     color: "#FF453A",
@@ -284,163 +281,175 @@ const styles = StyleSheet.create({
   idText: {
     color: "#8E8E93",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     fontFamily: "System",
   },
   summaryTitle: {
     color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     fontFamily: "System",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   summaryDesc: {
-    color: "#8E8E93",
+    color: "#A0A0A5",
     fontSize: 13.5,
     lineHeight: 19,
     fontFamily: "System",
-    marginBottom: 18,
+    fontWeight: "500",
+    marginBottom: 16,
   },
   progressBarBg: {
-    height: 3,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderRadius: 1.5,
     width: "100%",
+    height: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 2,
+    overflow: "hidden",
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#FF3B30",
-    borderRadius: 1.5,
+    backgroundColor: "#FF453A",
+    width: "65%",
   },
   sourcesSection: {
-    marginBottom: 20,
+    width: "100%",
+    marginBottom: 16,
   },
   sectionHeaderTitle: {
     color: "#8E8E93",
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 1.2,
     fontFamily: "System",
     marginBottom: 12,
   },
   sourceCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sourceTopRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
   },
   sourceLeftInfo: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
   iconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: "#1C1C1E",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   sourceName: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14.5,
+    fontWeight: "800",
     fontFamily: "System",
-    marginBottom: 2,
   },
   sourceType: {
     color: "#8E8E93",
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    fontFamily: "System",
-  },
-  badge: {
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  badgeText: {
-    fontSize: 8.5,
+    fontSize: 9.5,
     fontWeight: "800",
     fontFamily: "System",
+    marginTop: 2,
     letterSpacing: 0.5,
+  },
+  badge: {
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   badgeHigh: {
     backgroundColor: "rgba(255, 69, 58, 0.12)",
   },
-  badgeTextHigh: {
-    color: "#FF453A",
-  },
   badgeMedium: {
     backgroundColor: "rgba(255, 214, 10, 0.12)",
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: "800",
+    fontFamily: "System",
+  },
+  badgeTextHigh: {
+    color: "#FF453A",
   },
   badgeTextMedium: {
     color: "#FFD60A",
   },
   divider: {
     height: 1,
-    backgroundColor: "#1C1C1E",
-    marginVertical: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    width: "100%",
+    marginBottom: 12,
   },
   dataFoundLabel: {
     color: "#8E8E93",
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: 10,
+    fontWeight: "800",
     letterSpacing: 0.8,
     fontFamily: "System",
     marginBottom: 8,
   },
   tagsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 12,
   },
   tag: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 6,
-    paddingHorizontal: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    borderRadius: 12,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     marginRight: 8,
+    marginBottom: 4,
   },
   tagText: {
-    color: "#8E8E93",
-    fontSize: 11,
+    color: "#FFFFFF",
+    fontSize: 11.5,
     fontWeight: "600",
     fontFamily: "System",
   },
   addressBox: {
-    backgroundColor: "rgba(255, 255, 255, 0.02)",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
     borderColor: "rgba(255, 255, 255, 0.04)",
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 14,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    width: "100%",
+    marginBottom: 16,
   },
   addressText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: 13.5,
     fontFamily: "System",
+    fontWeight: "500",
   },
   cardActionRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   statusContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#30D158",
+    marginRight: 6,
   },
   statusSuccessText: {
     color: "#30D158",
@@ -448,108 +457,89 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "System",
   },
-  statusInfoText: {
-    color: "#8E8E93",
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
   viewDetailsButton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderWidth: 1,
     borderRadius: 16,
     paddingHorizontal: 12,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingVertical: 6,
+  },
+  viewDetailsOutline: {
+    backgroundColor: "transparent",
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   viewDetailsText: {
-    color: "#000000",
-    fontSize: 10,
+    color: "#FFFFFF",
+    fontSize: 11,
     fontWeight: "800",
-    fontFamily: "System",
-  },
-  viewDetailsOutlineButton: {
-    backgroundColor: "transparent",
-    borderColor: "#3E3E42",
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
   },
   viewDetailsOutlineText: {
-    color: "#FFFFFF",
-    fontSize: 10,
-    fontWeight: "800",
-    fontFamily: "System",
+    color: "#8E8E93",
   },
   commandCard: {
-    backgroundColor: "#121214",
-    borderLeftWidth: 3.5,
-    borderLeftColor: "#FFFFFF",
-    borderRadius: 12,
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    flexDirection: "row",
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 24,
-  },
-  commandCardContent: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   commandIcon: {
-    marginRight: 12,
-    marginTop: 2,
+    marginRight: 14,
   },
   commandTextContainer: {
     flex: 1,
   },
   commandTitle: {
     color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 14.5,
+    fontWeight: "800",
     fontFamily: "System",
-    marginBottom: 4,
   },
   commandDesc: {
     color: "#8E8E93",
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 12.5,
+    lineHeight: 18,
     fontFamily: "System",
+    marginTop: 4,
+    fontWeight: "500",
   },
   buttonContainer: {
-    marginTop: 8,
+    width: "100%",
+    marginTop: 10,
+    marginBottom: 10,
   },
   primaryButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
     marginBottom: 12,
   },
   primaryButtonText: {
     color: "#000000",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    fontSize: 14.5,
+    fontWeight: "800",
   },
   secondaryButton: {
-    flexDirection: "row",
     backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderWidth: 1.5,
+    borderRadius: 27,
+    height: 54,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
   secondaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

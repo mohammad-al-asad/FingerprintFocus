@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import Header from "@/components/ui/Header";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -27,20 +28,8 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top > 0 ? insets.top + 8 : 16 }]}>
-        <View style={styles.headerLeft}>
-          <Feather name="shield" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-          <Text style={styles.headerTitle}>Account</Text>
-        </View>
-        <TouchableOpacity
-          onPress={() => handleAction("Settings")}
-          style={styles.settingsButton}
-          activeOpacity={0.7}
-        >
-          <Feather name="settings" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+      {/* Header same as Home */}
+      <Header showBorder={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -128,15 +117,29 @@ export default function ProfileScreen() {
             </TouchableOpacity>
             <View style={styles.divider} />
 
-            {/* Row 4: Data Privacy Controls */}
+            {/* Row 4: Privacy Policy */}
             <TouchableOpacity
-              onPress={() => handleAction("Data Privacy Controls")}
+              onPress={() => router.push("/(profile)/privacy?type=privacy" as any)}
               style={styles.rowItem}
               activeOpacity={0.7}
             >
               <View style={styles.rowLeft}>
-                <Feather name="shield" size={18} color="#FFFFFF" style={{ marginRight: 16 }} />
-                <Text style={styles.rowText}>Data Privacy Controls</Text>
+                <Feather name="file-text" size={18} color="#FFFFFF" style={{ marginRight: 16 }} />
+                <Text style={styles.rowText}>Privacy Policy</Text>
+              </View>
+              <Feather name="chevron-right" size={16} color="#8E8E93" />
+            </TouchableOpacity>
+            <View style={styles.divider} />
+
+            {/* Row 5: Terms of Service */}
+            <TouchableOpacity
+              onPress={() => router.push("/(profile)/privacy?type=terms" as any)}
+              style={styles.rowItem}
+              activeOpacity={0.7}
+            >
+              <View style={styles.rowLeft}>
+                <Feather name="check-square" size={18} color="#FFFFFF" style={{ marginRight: 16 }} />
+                <Text style={styles.rowText}>Terms of Service</Text>
               </View>
               <Feather name="chevron-right" size={16} color="#8E8E93" />
             </TouchableOpacity>
@@ -354,5 +357,16 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "rgba(255, 255, 255, 0.04)",
     width: "100%",
+  },
+  headerAvatarButton: {
+    paddingLeft: 16,
+    paddingVertical: 4,
+  },
+  headerAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    borderWidth: 1,
   },
 });

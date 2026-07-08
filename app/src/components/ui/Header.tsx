@@ -7,9 +7,15 @@ interface HeaderProps {
   style?: ViewStyle;
   showBorder?: boolean;
   transparent?: boolean;
+  rightElement?: React.ReactNode;
 }
 
-export default function Header({ style, showBorder = true, transparent = false }: HeaderProps) {
+export default function Header({
+  style,
+  showBorder = true,
+  transparent = false,
+  rightElement,
+}: HeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -29,6 +35,7 @@ export default function Header({ style, showBorder = true, transparent = false }
           contentFit="contain"
           transition={200}
         />
+        {rightElement}
       </View>
     </View>
   );
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     height: 36,
   },
   logo: {

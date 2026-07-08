@@ -1,35 +1,118 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Platform,
   Alert,
+  Linking,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeInDown, FadeInUp, Layout } from "react-native-reanimated";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { Feather } from "@expo/vector-icons";
 
-const { width } = Dimensions.get("window");
+type CurrentPlanType = "monthly" | "yearly" | "unknown" | "none";
 
 export default function SubscriptionScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [isSubscribed, setIsSubscribed] = useState(true);
 
-  const handleManageBilling = () => {
-    Alert.alert("Manage Billing", "Redirecting to subscription portal...");
+  const [currentPlanType, setCurrentPlanType] = useState<CurrentPlanType>("monthly");
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const cyclePlanType = () => {
+    setCurrentPlanType((prev) => {
+      if (prev === "none") return "monthly";
+      if (prev === "monthly") return "yearly";
+      if (prev === "yearly") return "unknown";
+      return "none";
+    });
   };
 
-  const handleUpgrade = () => {
-    Alert.alert("Upgrade", "Processing premium upgrade request...", [
-      { text: "OK", onPress: () => setIsSubscribed(true) },
-    ]);
+  const handleUpgradeToYearly = () => {
+    setIsUpgrading(true);
+    setTimeout(() => {
+      setIsUpgrading(false);
+      setCurrentPlanType("yearly");
+      Alert.alert("Subscription Updated", "Your yearly plan is now active.");
+    }, 1000);
   };
+
+  const handleUpgradeToMonthly = () => {
+    setIsUpgrading(true);
+    setTimeout(() => {
+      setIsUpgrading(false);
+      setCurrentPlanType("monthly");
+      Alert.alert("Subscription Updated", "Your monthly plan is now active.");
+    }, 1000);
+  };
+
+  const handleRestore = () => {
+    setIsRestoring(true);
+    setTimeout(() => {
+      setIsRestoring(false);
+      setCurrentPlanType("yearly");
+      Alert.alert("Restore Success", "Your active membership has been successfully restored.");
+    }, 1000);
+  };
+
+  const handleManageSubscription = () => {
+    const url = Platform.OS === "ios"
+      ? "https://apps.apple.com/account/subscriptions"
+      : "https://play.google.com/store/account/subscriptions";
+    
+    Linking.openURL(url).catch(() => {
+      Alert.alert(
+        "Store Unavailable",
+        "Could not open store settings automatically. Please manage your subscription within your device system settings."
+      );
+    });
+  };
+
+  // Dynamic Content Memoizers
+  const activePlanTitle = useMemo(() => {
+    if (currentPlanType === "none") return "No Active Plan";
+    if (currentPlanType === "yearly") return "Premium Yearly Plan";
+    if (currentPlanType === "monthly") return "Premium Monthly Plan";
+    return "Premium Active Plan";
+  }, [currentPlanType]);
+
+  const activePlanCadence = useMemo(() => {
+    if (currentPlanType === "none") return "Free Scan Mode";
+    if (currentPlanType === "monthly") return "Monthly billing";
+    if (currentPlanType === "yearly") return "Yearly billing";
+    return "Store managed";
+  }, [currentPlanType]);
+
+  const activePlanPrice = useMemo(() => {
+    if (currentPlanType === "none") return "Free";
+    if (currentPlanType === "monthly") return "$9.99";
+    if (currentPlanType === "yearly") return "$79.99";
+    return "Managed";
+  }, [currentPlanType]);
+
+  const activePlanPeriod = useMemo(() => {
+    if (currentPlanType === "monthly") return "/mo";
+    if (currentPlanType === "yearly") return "/yr";
+    return "";
+  }, [currentPlanType]);
+
+  const nextBilling = useMemo(() => {
+    if (currentPlanType === "none") return "Not available";
+    if (currentPlanType === "monthly") return "May 28, 2026";
+    if (currentPlanType === "yearly") return "April 28, 2027";
+    return "Store controlled";
+  }, [currentPlanType]);
+
+  const renewalStatus = useMemo(() => {
+    if (currentPlanType === "none") return "Inactive";
+    if (currentPlanType === "unknown") return "Store managed";
+    return "Renews automatically";
+  }, [currentPlanType]);
 
   return (
     <View style={styles.container}>
@@ -43,232 +126,210 @@ export default function SubscriptionScreen() {
           <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>SUBSCRIPTION</Text>
-        
-        {/* Toggle Subscription State (Demo cycle icon on the right) */}
-        <TouchableOpacity
-          onPress={() => setIsSubscribed((prev) => !prev)}
-          style={styles.toggleButton}
-          activeOpacity={0.7}
-        >
-          <Feather name="refresh-cw" size={16} color="#FFFFFF" style={{ opacity: 0.6 }} />
-        </TouchableOpacity>
+        <View style={styles.headerRightPlaceholder} />
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 }]}
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 },
+        ]}
       >
-        {isSubscribed ? (
-          /* ================= SUBSCRIBED LAYOUT ================= */
-          <Animated.View entering={FadeInDown.duration(500)} style={{ width: "100%" }}>
-            {/* Title Section */}
-            <View style={styles.titleSection}>
-              <Text style={styles.mainTitle}>Subscription</Text>
-              <Text style={styles.subtitle}>Manage your security tier and billing cycles.</Text>
-            </View>
-
-            {/* Active Plan Card */}
-            <View style={styles.planCard}>
-              <View style={styles.planCardHeader}>
-                <View style={styles.activePlanBadge}>
-                  <Text style={styles.activePlanBadgeText}>ACTIVE PLAN</Text>
-                </View>
-                <View style={styles.statusRow}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusText}>Active</Text>
-                </View>
+        {/* Active Plan Card */}
+        <Animated.View
+          entering={FadeInUp.delay(50).duration(600)}
+          style={styles.activeCard}
+        >
+          <View style={styles.activeCardContent}>
+            <View style={styles.activeCardHeaderRow}>
+              <View style={styles.activePlanBadge}>
+                <Text style={styles.activePlanBadgeText}>
+                  {currentPlanType === "none" ? "FREE ACCOUNT" : "ACTIVE PLAN"}
+                </Text>
               </View>
-
-              <Text style={styles.planTitle}>Premium Monitoring</Text>
-
-              <View style={styles.billingGrid}>
-                <View style={styles.gridColumn}>
-                  <Text style={styles.gridLabel}>BILLING</Text>
-                  <Text style={styles.gridValue}>Monthly</Text>
-                </View>
-                <View style={styles.gridColumn}>
-                  <Text style={styles.gridLabel}>NEXT BILL</Text>
-                  <Text style={styles.gridValue}>May 28</Text>
-                </View>
-              </View>
-
-              <Text style={styles.includedFeaturesHeader}>INCLUDED FEATURES</Text>
-              
-              <View style={styles.featureList}>
-                <View style={styles.featureItemRow}>
-                  <Feather name="check" size={14} color="#8E8E93" style={styles.grayCheckIcon} />
-                  <Text style={styles.featureItemText}>Full exposure report</Text>
-                </View>
-                <View style={styles.featureItemRow}>
-                  <Feather name="check" size={14} color="#8E8E93" style={styles.grayCheckIcon} />
-                  <Text style={styles.featureItemText}>Monthly monitoring</Text>
-                </View>
-                <View style={styles.featureItemRow}>
-                  <Feather name="check" size={14} color="#8E8E93" style={styles.grayCheckIcon} />
-                  <Text style={styles.featureItemText}>Reappearance alerts</Text>
-                </View>
-                <View style={styles.featureItemRow}>
-                  <Feather name="check" size={14} color="#8E8E93" style={styles.grayCheckIcon} />
-                  <Text style={styles.featureItemText}>Supported remove request assistance</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                activeOpacity={0.9}
-                style={styles.manageBillingButton}
-                onPress={handleManageBilling}
-              >
-                <Text style={styles.manageBillingButtonText}>Manage Billing</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Recent Invoices Section */}
-            <View style={styles.invoicesSection}>
-              <Text style={styles.sectionHeaderTitle}>RECENT INVOICES</Text>
-              
-              <View style={styles.invoicesCard}>
-                {/* Invoice 1 */}
-                <View style={styles.invoiceRow}>
-                  <View style={styles.invoiceLeft}>
-                    <View style={styles.invoiceIconBox}>
-                      <Feather name="file-text" size={16} color="#FFFFFF" />
-                    </View>
-                    <View>
-                      <Text style={styles.invoiceDate}>April 28, 2024</Text>
-                      <Text style={styles.invoiceId}>INV-82910</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.invoicePrice}>$29.00</Text>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Invoice 2 */}
-                <View style={styles.invoiceRow}>
-                  <View style={styles.invoiceLeft}>
-                    <View style={styles.invoiceIconBox}>
-                      <Feather name="file-text" size={16} color="#FFFFFF" />
-                    </View>
-                    <View>
-                      <Text style={styles.invoiceDate}>March 28, 2024</Text>
-                      <Text style={styles.invoiceId}>INV-74122</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.invoicePrice}>$29.00</Text>
-                </View>
+              <View style={styles.starCircle}>
+                <Feather name="award" size={18} color="#FFFFFF" />
               </View>
             </View>
-          </Animated.View>
-        ) : (
-          /* ================= NON-SUBSCRIBED LAYOUT ================= */
-          <Animated.View entering={FadeInDown.duration(500)} style={{ width: "100%" }}>
-            {/* Title Section */}
-            <View style={styles.titleSectionCenter}>
-              <View style={styles.upgradeBadge}>
-                <Feather name="shield" size={11} color="#FF9F0A" style={{ marginRight: 5 }} />
-                <Text style={styles.upgradeBadgeText}>UPGRADE PROTECTION</Text>
+
+            <Text style={styles.activePlanTitle}>{activePlanTitle}</Text>
+            <Text style={styles.activePlanCadence}>{activePlanCadence}</Text>
+
+            <View style={styles.activePriceBlock}>
+              <Text style={styles.activePriceLabel}>CURRENT PRICE</Text>
+              <View style={styles.activePriceRow}>
+                <Text style={styles.activePriceText}>{activePlanPrice}</Text>
+                {!!activePlanPeriod && (
+                  <Text style={styles.activePricePeriod}>{activePlanPeriod}</Text>
+                )}
               </View>
-              <Text style={styles.mainTitleCenter}>Unlock full privacy monitoring</Text>
-              <Text style={styles.subtitleCenter}>
-                Stop data brokers from selling your digital identity. Gain proactive defense tools today.
+            </View>
+
+            <View style={styles.cardDivider} />
+
+            <View style={styles.activeDetailsGrid}>
+              <View style={styles.activeDetailItem}>
+                <Text style={styles.activeDetailLabel}>NEXT BILLING</Text>
+                <Text style={styles.activeDetailValue}>{nextBilling}</Text>
+              </View>
+
+              <View style={styles.activeDetailItem}>
+                <Text style={styles.activeDetailLabel}>RENEWAL</Text>
+                <Text style={styles.activeDetailValue}>{renewalStatus}</Text>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Plan Options Section */}
+        {currentPlanType === "none" && (
+          <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+            <Text style={styles.sectionHeader}>Available Plans</Text>
+
+            {/* Option 1: Monthly */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              activeOpacity={0.85}
+              onPress={handleUpgradeToMonthly}
+              disabled={isUpgrading}
+            >
+              <View style={styles.optionHeaderRow}>
+                <Text style={styles.optionPlanName}>Monthly Protection Plan</Text>
+                <Text style={styles.optionPlanPrice}>
+                  $9.99<Text style={styles.pricePeriod}>/mo</Text>
+                </Text>
+              </View>
+              <Text style={styles.optionPlanDescription}>
+                Continuous monitoring for data leaks with reappearance alerts and removal request assistance.
               </Text>
-            </View>
-
-            {/* Premium Plan Offer Card */}
-            <View style={styles.offerCard}>
-              <View style={styles.offerHeaderRow}>
-                <View>
-                  <Text style={styles.offerTitle}>Premium Monitoring</Text>
-                  <Text style={styles.offerSubtitle}>Annual protection engine</Text>
-                </View>
-                <View style={styles.offerPriceContainer}>
-                  <Text style={styles.offerPrice}>$9.99</Text>
-                  <Text style={styles.offerPricePeriod}>/mo</Text>
-                </View>
+              <View style={styles.upgradeButton}>
+                <Text style={styles.upgradeButtonText}>
+                  {isUpgrading ? "Processing..." : "Select Monthly Plan"}
+                </Text>
               </View>
+            </TouchableOpacity>
 
-              <View style={styles.offerFeatureList}>
-                {/* Feature 1 */}
-                <View style={styles.offerFeatureRow}>
-                  <Feather name="check-circle" size={16} color="#30D158" style={styles.greenCheckIcon} />
-                  <View style={styles.offerFeatureTextContainer}>
-                    <Text style={styles.offerFeatureTitle}>Full report</Text>
-                    <Text style={styles.offerFeatureDesc}>Comprehensive exposure mapping across 200+ sites</Text>
-                  </View>
-                </View>
-
-                {/* Feature 2 */}
-                <View style={styles.offerFeatureRow}>
-                  <Feather name="check-circle" size={16} color="#30D158" style={styles.greenCheckIcon} />
-                  <View style={styles.offerFeatureTextContainer}>
-                    <Text style={styles.offerFeatureTitle}>Monthly rescans</Text>
-                    <Text style={styles.offerFeatureDesc}>Continuous vigilance for new data leaks</Text>
-                  </View>
-                </View>
-
-                {/* Feature 3 */}
-                <View style={styles.offerFeatureRow}>
-                  <Feather name="check-circle" size={16} color="#30D158" style={styles.greenCheckIcon} />
-                  <View style={styles.offerFeatureTextContainer}>
-                    <Text style={styles.offerFeatureTitle}>Reappearance alerts</Text>
-                    <Text style={styles.offerFeatureDesc}>Immediate notification if your data resurfaces</Text>
-                  </View>
-                </View>
-
-                {/* Feature 4 */}
-                <View style={styles.offerFeatureRow}>
-                  <Feather name="check-circle" size={16} color="#30D158" style={styles.greenCheckIcon} />
-                  <View style={styles.offerFeatureTextContainer}>
-                    <Text style={styles.offerFeatureTitle}>Remove request assistance</Text>
-                    <Text style={styles.offerFeatureDesc}>Automated takedown requests for your info</Text>
-                  </View>
-                </View>
-
-                {/* Feature 5 */}
-                <View style={styles.offerFeatureRow}>
-                  <Feather name="check-circle" size={16} color="#30D158" style={styles.greenCheckIcon} />
-                  <View style={styles.offerFeatureTextContainer}>
-                    <Text style={styles.offerFeatureTitle}>FTC/IC3 preparation</Text>
-                    <Text style={styles.offerFeatureDesc}>Legal documentation for identity theft reports</Text>
-                  </View>
-                </View>
+            {/* Option 2: Yearly */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              activeOpacity={0.85}
+              onPress={handleUpgradeToYearly}
+              disabled={isUpgrading}
+            >
+              <View style={styles.currentBadge}>
+                <Text style={styles.currentBadgeText}>BEST VALUE</Text>
               </View>
-
-              <View style={styles.offerDivider} />
-
-              <View style={styles.securityLiftRow}>
-                <View>
-                  <Text style={styles.securityLiftLabel}>SECURITY LIFT</Text>
-                  <Text style={styles.securityLiftValue}>+85%</Text>
-                </View>
-                <View style={styles.securityLiftProgressContainer}>
-                  <View style={styles.securityLiftProgressBg}>
-                    <View style={[styles.securityLiftProgressFill, { width: "85%" }]} />
-                  </View>
-                </View>
+              <View style={styles.optionHeaderRow}>
+                <Text style={styles.optionPlanName}>Annual Protection Plan</Text>
+                <Text style={styles.optionPlanPrice}>
+                  $79.99<Text style={styles.pricePeriod}>/yr</Text>
+                </Text>
               </View>
-            </View>
+              <Text style={styles.optionPlanDescription}>
+                Full yearly coverage. Save over 30% compared to the monthly plan. Cancels anytime.
+              </Text>
+              <View style={styles.upgradeButton}>
+                <Text style={styles.upgradeButtonText}>
+                  {isUpgrading ? "Processing..." : "Select Annual Plan"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
 
-            {/* Action Buttons */}
-            <View style={styles.offerButtonContainer}>
-              <TouchableOpacity
-                activeOpacity={0.9}
-                style={styles.primaryButton}
-                onPress={handleUpgrade}
-              >
-                <Text style={styles.primaryButtonText}>UPGRADE NOW</Text>
-              </TouchableOpacity>
+        {currentPlanType === "monthly" && (
+          <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+            <Text style={styles.sectionHeader}>Upgrade Available</Text>
 
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.outlineButton}
-                onPress={() => router.back()}
-              >
-                <Text style={styles.outlineButtonText}>MAYBE LATER</Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionCard}
+              activeOpacity={0.85}
+              onPress={handleUpgradeToYearly}
+              disabled={isUpgrading}
+            >
+              <View style={styles.currentBadge}>
+                <Text style={styles.currentBadgeText}>BEST VALUE</Text>
+              </View>
+              <View style={styles.optionHeaderRow}>
+                <Text style={styles.optionPlanName}>Upgrade to Yearly</Text>
+                <Text style={styles.optionPlanPrice}>
+                  $79.99<Text style={styles.pricePeriod}>/yr</Text>
+                </Text>
+              </View>
+              <Text style={styles.optionPlanDescription}>
+                Switch from monthly to yearly billing. Save over 30% and receive uninterrupted protection.
+              </Text>
+              <View style={styles.upgradeButton}>
+                <Text style={styles.upgradeButtonText}>
+                  {isUpgrading ? "Upgrading..." : "Upgrade to Yearly"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
+        {currentPlanType === "yearly" && (
+          <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+            <Text style={styles.sectionHeader}>Plan Options</Text>
+            <View style={styles.infoCard}>
+              <Feather name="check-circle" size={18} color="#30D158" />
+              <Text style={styles.infoCardText}>
+                You are already on the best plan with the best value.
+              </Text>
             </View>
           </Animated.View>
         )}
+
+        {currentPlanType === "unknown" && (
+          <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+            <Text style={styles.sectionHeader}>Plan Options</Text>
+            <View style={styles.infoCard}>
+              <Feather name="info" size={18} color="#0A84FF" />
+              <Text style={styles.infoCardText}>
+                Your active plan is managed by the app store. Use Manage Subscription to make changes.
+              </Text>
+            </View>
+          </Animated.View>
+        )}
+
+        {/* Action Buttons */}
+        <Animated.View entering={FadeInDown.delay(150).duration(600)} style={styles.actionContainer}>
+          <TouchableOpacity
+            style={styles.restoreBtn}
+            activeOpacity={0.8}
+            onPress={handleRestore}
+            disabled={isRestoring}
+          >
+            <Text style={styles.restoreBtnText}>
+              {isRestoring ? "Restoring..." : "Restore Purchase"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.manageBtn}
+            activeOpacity={0.8}
+            onPress={handleManageSubscription}
+          >
+            <Text style={styles.manageBtnText}>Manage Subscription</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Legal Info and Links */}
+        <Text style={styles.legalText}>
+          Payments will be charged to your store account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. You can manage or cancel your subscription at any time in your store account settings.
+        </Text>
+
+        <View style={styles.footerLinksRow}>
+          <TouchableOpacity onPress={() => router.push("/(profile)/privacy?type=privacy" as any)}>
+            <Text style={styles.footerLinkText}>Privacy Policy</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerDot}>•</Text>
+          <TouchableOpacity onPress={() => router.push("/(profile)/privacy?type=terms" as any)}>
+            <Text style={styles.footerLinkText}>Terms of Use</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -300,402 +361,269 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontFamily: "System",
   },
-  toggleButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 4,
+  headerRightPlaceholder: {
+    width: 56,
+  },
+  scrollView: {
+    flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    flexGrow: 1,
+    paddingHorizontal: 24,
     paddingTop: 24,
   },
-  titleSection: {
-    marginBottom: 24,
-  },
-  titleSectionCenter: {
-    alignItems: "center",
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  upgradeBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 159, 10, 0.08)",
-    borderColor: "rgba(255, 159, 10, 0.15)",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginBottom: 16,
-  },
-  upgradeBadgeText: {
-    color: "#FF9F0A",
-    fontSize: 9.5,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    fontFamily: "System",
-  },
-  mainTitle: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
-    fontFamily: "System",
-    marginBottom: 4,
-  },
-  mainTitleCenter: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
-    fontFamily: "System",
-    textAlign: "center",
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  subtitle: {
-    color: "#8E8E93",
-    fontSize: 13.5,
-    fontFamily: "System",
-  },
-  subtitleCenter: {
-    color: "#8E8E93",
-    fontSize: 13.5,
-    lineHeight: 19,
-    fontFamily: "System",
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-  
-  /* Subscribed View Styles */
-  planCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
-    borderWidth: 1,
+  activeCard: {
     borderRadius: 16,
-    padding: 20,
     marginBottom: 24,
+    overflow: "hidden",
+    backgroundColor: "#121214",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.05)",
   },
-  planCardHeader: {
+  activeCardContent: {
+    flex: 1,
+    padding: 20,
+  },
+  activeCardHeaderRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 14,
+    alignItems: "center",
+    marginBottom: 12,
   },
   activePlanBadge: {
     backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderRadius: 12,
-    paddingHorizontal: 8,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
   },
   activePlanBadgeText: {
-    color: "#8E8E93",
-    fontSize: 9,
-    fontWeight: "700",
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "800",
     letterSpacing: 0.8,
-    fontFamily: "System",
   },
-  statusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#30D158",
-    marginRight: 6,
-  },
-  statusText: {
-    color: "#30D158",
-    fontSize: 12.5,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
-  planTitle: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "700",
-    fontFamily: "System",
-    marginBottom: 20,
-  },
-  billingGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "rgba(255, 255, 255, 0.02)",
-    borderColor: "rgba(255, 255, 255, 0.04)",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 20,
-  },
-  gridColumn: {
-    flex: 1,
-  },
-  gridLabel: {
-    color: "#8E8E93",
-    fontSize: 9,
-    fontWeight: "700",
-    letterSpacing: 0.8,
-    fontFamily: "System",
-    marginBottom: 4,
-  },
-  gridValue: {
-    color: "#FFFFFF",
-    fontSize: 13.5,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
-  includedFeaturesHeader: {
-    color: "#8E8E93",
-    fontSize: 9.5,
-    fontWeight: "700",
-    letterSpacing: 1,
-    fontFamily: "System",
-    marginBottom: 12,
-  },
-  featureList: {
-    marginBottom: 24,
-  },
-  featureItemRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
-  grayCheckIcon: {
-    marginRight: 8,
-    marginTop: 2,
-  },
-  featureItemText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    lineHeight: 18,
-    fontFamily: "System",
-    flex: 1,
-  },
-  manageBillingButton: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    height: 38,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-  },
-  manageBillingButtonText: {
-    color: "#000000",
-    fontSize: 12.5,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  invoicesSection: {
-    marginBottom: 12,
-  },
-  sectionHeaderTitle: {
-    color: "#8E8E93",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.2,
-    fontFamily: "System",
-    marginBottom: 12,
-  },
-  invoicesCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  invoiceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-  },
-  invoiceLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  invoiceIconBox: {
+  starCircle: {
     width: 32,
     height: 32,
-    borderRadius: 6,
-    backgroundColor: "#1C1C1E",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
   },
-  invoiceDate: {
+  activePlanTitle: {
+    fontSize: 22,
+    fontWeight: "800",
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "600",
-    fontFamily: "System",
-    marginBottom: 1,
-  },
-  invoiceId: {
-    color: "#8E8E93",
-    fontSize: 11,
-    fontFamily: "System",
-  },
-  invoicePrice: {
-    color: "#FFFFFF",
-    fontSize: 13.5,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#1C1C1E",
-  },
-
-  /* Non-Subscribed View Styles */
-  offerCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  offerHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  offerTitle: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
     fontFamily: "System",
     marginBottom: 4,
   },
-  offerSubtitle: {
+  activePlanCadence: {
     color: "#8E8E93",
-    fontSize: 12.5,
-    fontFamily: "System",
-  },
-  offerPriceContainer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  offerPrice: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
-    fontFamily: "System",
-    lineHeight: 28,
-  },
-  offerPricePeriod: {
-    color: "#8E8E93",
-    fontSize: 11.5,
-    fontFamily: "System",
-    marginLeft: 2,
-    marginBottom: 3,
-  },
-  offerFeatureList: {
+    fontSize: 13,
+    fontWeight: "600",
     marginBottom: 16,
   },
-  offerFeatureRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 14,
+  activePriceBlock: {
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.06)",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  greenCheckIcon: {
-    marginRight: 10,
-    marginTop: 2,
-  },
-  offerFeatureTextContainer: {
-    flex: 1,
-  },
-  offerFeatureTitle: {
-    color: "#FFFFFF",
-    fontSize: 13.5,
-    fontWeight: "600",
-    fontFamily: "System",
-    marginBottom: 2,
-  },
-  offerFeatureDesc: {
+  activePriceLabel: {
     color: "#8E8E93",
-    fontSize: 11,
-    lineHeight: 15,
-    fontFamily: "System",
-  },
-  offerDivider: {
-    height: 1,
-    backgroundColor: "#1C1C1E",
-    marginVertical: 12,
-  },
-  securityLiftRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-  },
-  securityLiftLabel: {
-    color: "#8E8E93",
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: 10,
+    fontWeight: "800",
     letterSpacing: 0.8,
-    fontFamily: "System",
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  securityLiftValue: {
-    color: "#30D158",
-    fontSize: 18,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  securityLiftProgressContainer: {
-    flex: 1,
-    marginLeft: 24,
+  activePriceRow: {
+    flexDirection: "row",
     alignItems: "flex-end",
   },
-  securityLiftProgressBg: {
-    height: 3,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderRadius: 1.5,
-    width: "80%",
+  activePriceText: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "900",
+    letterSpacing: -1,
   },
-  securityLiftProgressFill: {
-    height: "100%",
-    backgroundColor: "#30D158",
-    borderRadius: 1.5,
-  },
-  offerButtonContainer: {
-    marginTop: 4,
-  },
-  primaryButton: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-    width: "100%",
-  },
-  primaryButtonText: {
-    color: "#000000",
-    fontSize: 13,
+  activePricePeriod: {
+    color: "#8E8E93",
+    fontSize: 15,
     fontWeight: "700",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    marginLeft: 4,
+    marginBottom: 4,
   },
-  outlineButton: {
-    backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
+  cardDivider: {
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    marginVertical: 14,
   },
-  outlineButtonText: {
+  activeDetailsGrid: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  activeDetailItem: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  activeDetailLabel: {
+    color: "#8E8E93",
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 0.6,
+    marginBottom: 4,
+  },
+  activeDetailValue: {
     color: "#FFFFFF",
     fontSize: 13,
     fontWeight: "700",
-    fontFamily: "System",
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginTop: 14,
+    marginBottom: 12,
+  },
+  optionCard: {
+    backgroundColor: "#121214",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    marginBottom: 16,
+    position: "relative",
+  },
+  currentBadge: {
+    position: "absolute",
+    top: -10,
+    right: 15,
+    backgroundColor: "#30D158",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  currentBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "800",
     letterSpacing: 0.5,
+  },
+  optionHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  optionPlanName: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  optionPlanPrice: {
+    fontSize: 19,
+    fontWeight: "800",
+    color: "#30D158",
+  },
+  pricePeriod: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#8E8E93",
+  },
+  optionPlanDescription: {
+    fontSize: 13.5,
+    color: "#8E8E93",
+    lineHeight: 19,
+  },
+  upgradeButton: {
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 18,
+  },
+  upgradeButtonText: {
+    color: "#000000",
+    fontSize: 15,
+    fontWeight: "800",
+  },
+  infoCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#121214",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    marginBottom: 14,
+  },
+  infoCardText: {
+    flex: 1,
+    color: "#8E8E93",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 20,
+    marginLeft: 12,
+  },
+  actionContainer: {
+    marginTop: 12,
+    marginBottom: 24,
+    gap: 12,
+  },
+  restoreBtn: {
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: "#121214",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  restoreBtnText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  manageBtn: {
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  manageBtnText: {
+    color: "#8E8E93",
+    fontSize: 14,
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
+  legalText: {
+    fontSize: 12,
+    color: "#8E8E93",
+    lineHeight: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  footerLinksRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
+  footerLinkText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  footerDot: {
+    fontSize: 12,
+    color: "#8E8E93",
   },
 });

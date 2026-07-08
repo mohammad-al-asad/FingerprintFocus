@@ -33,20 +33,29 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="report"
+        name="result"
         options={{
-          title: "Report",
+          title: "Result",
           tabBarIcon: ({ color, size }) => (
             <Feather name="file-text" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
+        name="removals"
+        options={{
+          title: "Removals",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="trash-2" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <Feather name="settings" size={size} color={color} />
           ),
         }}
       />

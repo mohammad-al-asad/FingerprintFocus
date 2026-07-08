@@ -28,17 +28,17 @@ interface NotificationOption {
 const NOTIFICATION_OPTIONS: NotificationOption[] = [
   {
     id: "monthly-scan",
-    title: "Monthly scan completed",
-    description: "Receive a digest when your automated footprint scan is finished.",
-    iconName: "radar",
-    iconType: "material",
+    title: "Monthly scans",
+    description: "Get a summary each time your fingerprint scan finishes.",
+    iconName: "target",
+    iconType: "feather",
     iconColor: "#FFFFFF",
     defaultVal: true,
   },
   {
     id: "new-exposure",
     title: "New exposure found",
-    description: "Immediate alerts when your PII is detected on a new site.",
+    description: "Get immediate alerts when your personal information (PII) is detected on a new site.",
     iconName: "eye",
     iconType: "feather",
     iconColor: "#FF453A",
@@ -46,7 +46,7 @@ const NOTIFICATION_OPTIONS: NotificationOption[] = [
   },
   {
     id: "remove-request",
-    title: "Remove request status update",
+    title: "Data removal updates",
     description: "Get notified when a data broker confirms your removal.",
     iconName: "check-circle",
     iconType: "feather",
@@ -55,7 +55,7 @@ const NOTIFICATION_OPTIONS: NotificationOption[] = [
   },
   {
     id: "billing-updates",
-    title: "Billing updates",
+    title: "Billing notices",
     description: "Invoices, renewal reminders, and payment status.",
     iconName: "credit-card",
     iconType: "feather",
@@ -186,7 +186,7 @@ export default function NotificationSettingsScreen() {
             style={styles.saveButton}
             onPress={handleSave}
           >
-            <Text style={styles.saveButtonText}>SAVE PREFERENCES</Text>
+            <Text style={styles.saveButtonText}>Save Preferences</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -264,9 +264,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 34,
+    height: 52,
+    borderRadius: 17,
     backgroundColor: "#1C1C1E",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
@@ -279,46 +279,43 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 15.5,
+    fontWeight: "700",
     fontFamily: "System",
     marginBottom: 4,
   },
   optionDescription: {
     color: "#8E8E93",
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 12.5,
+    lineHeight: 17,
     fontFamily: "System",
   },
   
   /* Custom Switch Styles matching premium mockup */
   switchTrack: {
-    width: 50,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    width: 51,
+    height: 31,
+    borderRadius: 15.5,
     padding: 2,
     justifyContent: "center",
   },
   switchTrackActive: {
-    backgroundColor: "#000000",
-    borderColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF",
   },
   switchTrackInactive: {
-    backgroundColor: "#000000",
-    borderColor: "#3A3A3C",
+    backgroundColor: "#2C2C2E",
   },
   switchThumb: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 27,
+    height: 27,
+    borderRadius: 13.5,
   },
   switchThumbActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#000000",
     alignSelf: "flex-end",
   },
   switchThumbInactive: {
-    backgroundColor: "#48484A",
+    backgroundColor: "#48484A", // Matches the inactive grey thumb in the image
     alignSelf: "flex-start",
   },
 
@@ -327,17 +324,16 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
   saveButtonText: {
     color: "#000000",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 14.5,
+    fontWeight: "800",
     fontFamily: "System",
-    letterSpacing: 0.5,
   },
 });

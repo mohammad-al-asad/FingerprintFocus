@@ -31,17 +31,20 @@ export default function PhoneNumberExposureScreen() {
           <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>NUMBER EXPOSURE</Text>
-        <View style={styles.headerRightPlaceholder} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom > 0 ? insets.bottom + 24 : 40 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 24 }
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Title Section */}
         <Animated.View entering={FadeInUp.delay(50).duration(500)} style={styles.titleSection}>
-          <Text style={styles.mainTitle}>Phone Number Exposure</Text>
-          <Text style={styles.subtitle}>Phone numbers found on public people-search or broker sites.</Text>
+          <Text style={styles.mainTitle}>Exposed Phone Numbers</Text>
+          <Text style={styles.subtitle}>Your phone number was found on people-search and data broker sites.</Text>
         </Animated.View>
 
         {/* Summary Card */}
@@ -52,11 +55,12 @@ export default function PhoneNumberExposureScreen() {
           </View>
 
           <View style={styles.cardHeaderRow}>
-            <Text style={styles.summaryTitle}>2 phone matches found</Text>
+            <View style={styles.riskLevelBadge}>
+              <Text style={styles.riskLevelText}>MEDIUM RISK LEVEL</Text>
+            </View>
           </View>
-          <View style={styles.riskLevelBadge}>
-            <Text style={styles.riskLevelText}>MEDIUM RISK</Text>
-          </View>
+
+          <Text style={styles.summaryTitle}>2 phone matches found</Text>
           <Text style={styles.summaryDesc}>
             Matches found on high-traffic data brokers. We recommend initiating removal requests.
           </Text>
@@ -70,7 +74,7 @@ export default function PhoneNumberExposureScreen() {
           <TouchableOpacity activeOpacity={0.8} style={styles.brokerCard}>
             <View style={styles.brokerTopRow}>
               <View style={styles.brokerLeftInfo}>
-                <View style={styles.iconBox}>
+                <View style={[styles.iconBox, { backgroundColor: "rgba(255, 69, 58, 0.08)" }]}>
                   <Feather name="globe" size={18} color="#FF453A" />
                 </View>
                 <View>
@@ -98,7 +102,7 @@ export default function PhoneNumberExposureScreen() {
           <TouchableOpacity activeOpacity={0.8} style={styles.brokerCard}>
             <View style={styles.brokerTopRow}>
               <View style={styles.brokerLeftInfo}>
-                <View style={styles.iconBox}>
+                <View style={[styles.iconBox, { backgroundColor: "rgba(255, 214, 10, 0.08)" }]}>
                   <Feather name="globe" size={18} color="#FFD60A" />
                 </View>
                 <View>
@@ -115,7 +119,7 @@ export default function PhoneNumberExposureScreen() {
 
             <View style={styles.brokerBottomRow}>
               <View style={styles.manualStatus}>
-                <Text style={styles.manualStatusText}>Manual steps</Text>
+                <Text style={styles.manualStatusText}>Manual Steps</Text>
               </View>
               <Text style={styles.viewLinkText}>VIEW FINDING ›</Text>
             </View>
@@ -126,7 +130,7 @@ export default function PhoneNumberExposureScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.disclosureBox}>
           <Feather name="info" size={16} color="#8E8E93" style={styles.infoIcon} />
           <Text style={styles.disclosureText}>
-            Data brokers aggregate public records, social media, and marketing lists to create searchable profiles. Your exposure score is calculated based on site traffic and data granularity.
+            Data brokers collect public records, social media, and marketing data to build searchable profiles. Your exposure score reflects how much of your information is exposed and how easy it is to find.
           </Text>
         </Animated.View>
 
@@ -137,16 +141,16 @@ export default function PhoneNumberExposureScreen() {
             style={styles.primaryButton}
             onPress={() => router.push("/(report)/remove" as any)}
           >
-            <Text style={styles.primaryButtonText}>SEND REMOVAL REQUEST</Text>
+            <Text style={styles.primaryButtonText}>Send Removal Request</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.secondaryButton}
-            onPress={() => router.push("/government" as any)}
+            onPress={() => router.push("/(report)/government" as any)}
           >
             <Feather name="file-text" size={14} color="#FFFFFF" style={{ marginRight: 8 }} />
-            <Text style={styles.secondaryButtonText}>Prepare FTC / IC3 Report</Text>
+            <Text style={styles.secondaryButtonText}>Prepare Identity Theft Report</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -166,8 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     paddingBottom: 16,
     width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#1C1C1E",
   },
   backButton: {
     paddingHorizontal: 16,
@@ -180,33 +182,32 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontFamily: "System",
   },
-  headerRightPlaceholder: {
-    width: 56,
-  },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 10,
   },
   titleSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   mainTitle: {
     color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
     fontFamily: "System",
     marginBottom: 4,
+    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#8E8E93",
-    fontSize: 13,
+    fontSize: 14.5,
     fontFamily: "System",
+    fontWeight: "500",
   },
   summaryCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 214, 10, 0.15)",
+    backgroundColor: "rgba(255, 214, 10, 0.05)",
+    borderColor: "rgba(255, 214, 10, 0.12)",
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 20,
     marginBottom: 24,
     position: "relative",
@@ -214,30 +215,22 @@ const styles = StyleSheet.create({
   },
   watermarkContainer: {
     position: "absolute",
-    right: 8,
-    top: 8,
+    right: 16,
+    bottom: 16,
+    opacity: 0.04,
   },
   cardHeaderRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  summaryTitle: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
-    fontFamily: "System",
+    alignItems: "center",
+    marginBottom: 12,
   },
   riskLevelBadge: {
-    backgroundColor: "rgba(255, 214, 10, 0.12)",
+    backgroundColor: "rgba(255, 214, 10, 0.15)",
     borderRadius: 12,
-    alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: "rgba(255, 214, 10, 0.25)",
+    alignSelf: "flex-start",
   },
   riskLevelText: {
     color: "#FFD60A",
@@ -245,95 +238,104 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontFamily: "System",
   },
+  summaryTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "800",
+    fontFamily: "System",
+    marginBottom: 6,
+  },
   summaryDesc: {
-    color: "#8E8E93",
+    color: "#A0A0A5",
     fontSize: 13.5,
     lineHeight: 19,
     fontFamily: "System",
+    fontWeight: "500",
   },
   brokersSection: {
+    width: "100%",
     marginBottom: 20,
   },
   sectionHeaderTitle: {
     color: "#8E8E93",
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 1.2,
     fontFamily: "System",
     marginBottom: 12,
   },
   brokerCard: {
-    backgroundColor: "#121214",
-    borderColor: "rgba(255, 255, 255, 0.04)",
+    backgroundColor: "rgba(22, 22, 26, 0.65)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
   },
   brokerTopRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
   },
   brokerLeftInfo: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
   iconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: "#1C1C1E",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   brokerName: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14.5,
+    fontWeight: "800",
     fontFamily: "System",
-    marginBottom: 2,
   },
   brokerDataScope: {
     color: "#8E8E93",
-    fontSize: 11.5,
+    fontSize: 12.5,
     fontFamily: "System",
+    marginTop: 2,
+    fontWeight: "500",
   },
   badge: {
-    borderRadius: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  badgeText: {
-    fontSize: 8.5,
-    fontWeight: "800",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   badgeHigh: {
-    backgroundColor: "rgba(255, 69, 58, 0.15)",
+    backgroundColor: "rgba(255, 69, 58, 0.12)",
+  },
+  badgeMedium: {
+    backgroundColor: "rgba(255, 214, 10, 0.12)",
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: "800",
+    fontFamily: "System",
   },
   badgeTextHigh: {
     color: "#FF453A",
-  },
-  badgeMedium: {
-    backgroundColor: "rgba(255, 214, 10, 0.15)",
   },
   badgeTextMedium: {
     color: "#FFD60A",
   },
   divider: {
     height: 1,
-    backgroundColor: "#1C1C1E",
-    marginVertical: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    width: "100%",
+    marginBottom: 12,
   },
   brokerBottomRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   removalStatus: {
     flexDirection: "row",
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
   },
   removalStatusText: {
     color: "#30D158",
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: "600",
     fontFamily: "System",
   },
@@ -356,74 +358,74 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 12,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
   },
   manualStatusText: {
     color: "#8E8E93",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     fontFamily: "System",
   },
   viewLinkText: {
     color: "#FFFFFF",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    fontFamily: "System",
+    fontSize: 11.5,
+    fontWeight: "800",
   },
   disclosureBox: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "rgba(255, 255, 255, 0.01)",
-    borderColor: "rgba(255, 255, 255, 0.03)",
+    backgroundColor: "rgba(22, 22, 26, 0.45)",
+    borderColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     marginBottom: 24,
   },
   infoIcon: {
-    marginRight: 10,
-    marginTop: 1,
+    marginRight: 12,
+    marginTop: 2,
   },
   disclosureText: {
     flex: 1,
     color: "#8E8E93",
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 13,
+    lineHeight: 18,
     fontFamily: "System",
+    fontWeight: "500",
   },
   buttonContainer: {
-    marginTop: 8,
+    width: "100%",
+    marginTop: 10,
+    marginBottom: 10,
   },
   primaryButton: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 27,
+    height: 54,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
     marginBottom: 12,
   },
   primaryButtonText: {
     color: "#000000",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-    letterSpacing: 0.5,
+    fontSize: 14.5,
+    fontWeight: "800",
   },
   secondaryButton: {
-    flexDirection: "row",
     backgroundColor: "transparent",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#3E3E42",
-    height: 48,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderWidth: 1.5,
+    borderRadius: 27,
+    height: 54,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
   secondaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

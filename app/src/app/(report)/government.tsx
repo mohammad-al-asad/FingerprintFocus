@@ -39,23 +39,15 @@ export default function GovernmentReportScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top > 0 ? insets.top + 8 : 16 }]}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-            activeOpacity={0.7}
-          >
-            <Feather name="chevron-left" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>PRIVACERA</Text>
-        </View>
         <TouchableOpacity
-          style={styles.shieldButton}
+          onPress={() => router.back()}
+          style={styles.backButton}
           activeOpacity={0.7}
-          onPress={() => Alert.alert("Security Info", "All prepared report packets are encrypted with AES-256 local keys.")}
         >
-          <Feather name="shield" size={20} color="#FFFFFF" />
+          <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>GOVERNMENT REPORT</Text>
+        <View style={{ width: 56 }} />
       </View>
 
       <ScrollView
@@ -182,13 +174,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#1C1C1E",
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   backButton: {
-    paddingLeft: 16,
-    paddingRight: 12,
+    paddingHorizontal: 16,
     paddingVertical: 4,
   },
   headerTitle: {
@@ -197,10 +184,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1.5,
     fontFamily: "System",
-  },
-  shieldButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 4,
   },
   scrollContent: {
     paddingHorizontal: 20,

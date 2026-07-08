@@ -2,21 +2,22 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "@/components/ui/Header";
 import Button from "@/components/ui/Button";
 
 interface PrivacyCardProps {
   title: string;
   description: string;
-  iconName: React.ComponentProps<typeof Feather>["name"];
+  icon: React.ReactNode;
 }
 
-function PrivacyCard({ title, description, iconName }: PrivacyCardProps) {
+function PrivacyCard({ title, description, icon }: PrivacyCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.iconContainer}>
-        <Feather name={iconName} size={22} color="#FFFFFF" />
+        {icon}
       </View>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{title}</Text>
@@ -28,6 +29,7 @@ function PrivacyCard({ title, description, iconName }: PrivacyCardProps) {
 
 export default function ProfileSetupIntroScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const handleContinue = () => {
     router.push("/(profileSetup)/identity" as any);
@@ -35,37 +37,45 @@ export default function ProfileSetupIntroScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Standard header containing logo */}
       <Header />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView 
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 24 }
+        ]} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.content}>
           {/* Headline and Description */}
-          <Text style={styles.title}>Your privacy profile stays protected</Text>
+          <Text style={styles.title}>Your privacy profile</Text>
           <Text style={styles.subtitle}>
-            We use your details only to detect public exposure, generate your report, and support remove requests.
+            We use your details only to detect public exposure, generate your report, and support data removal requests.
           </Text>
 
           {/* Cards List */}
           <View style={styles.cardsList}>
             <PrivacyCard
               title="Encrypted data storage"
-              description="AES-256 military-grade encryption for all stored identifiers."
-              iconName="shield"
+              description="Safety first. We use AES-256 military-grade encryption for all stored identifiers."
+              icon={<MaterialCommunityIcons name="shield-check" size={20} color="#FFFFFF" />}
             />
             <PrivacyCard
               title="You control your profile"
-              description="Instant deletion of all personal data upon account closure."
-              iconName="user"
+              description="Delete your profile and personal data at any time."
+              icon={<Feather name="user" size={18} color="#FFFFFF" />}
             />
             <PrivacyCard
-              title="No selling personal information"
-              description="We are a privacy service, not a data broker. Your info is never for sale."
-              iconName="slash"
+              title="Data is never sold"
+              description="Your info is never for sale. Ever."
+              icon={<MaterialCommunityIcons name="cancel" size={18} color="#FFFFFF" />}
             />
             <PrivacyCard
-              title="Secure exposure scanning"
-              description="Scanning algorithms run in isolated sandboxes to prevent leaks."
-              iconName="cpu"
+              title="Protected process"
+              description="Scans for your digital fingerprint run in protected environments to help prevent leaks."
+              icon={<Feather name="shield" size={18} color="#FFFFFF" />}
             />
           </View>
 
@@ -77,8 +87,8 @@ export default function ProfileSetupIntroScreen() {
               style={styles.continueButton}
             />
             <View style={styles.badgeContainer}>
-              <Feather name="shield" size={14} color="#8E8E93" style={{ marginRight: 6 }} />
-              <Text style={styles.badgeText}>SECURE END-TO-END CONNECTION ACTIVE</Text>
+              <Feather name="lock" size={12} color="#48484A" style={{ marginRight: 6 }} />
+              <Text style={styles.badgeText}>SECURE END-TO-END CONNECTION</Text>
             </View>
           </View>
         </Animated.View>
@@ -94,7 +104,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 32,
   },
   content: {
     paddingHorizontal: 20,
@@ -102,11 +111,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "700",
-    lineHeight: 36,
+    fontSize: 26,
+    fontWeight: "800",
+    lineHeight: 34,
     marginBottom: 12,
     fontFamily: "System",
+    letterSpacing: -0.5,
   },
   subtitle: {
     color: "#A0A0A5",
@@ -116,23 +126,23 @@ const styles = StyleSheet.create({
     fontFamily: "System",
   },
   cardsList: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   card: {
     flexDirection: "row",
-    backgroundColor: "#121214",
+    backgroundColor: "rgba(22, 22, 26, 0.45)",
     borderColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
     borderRadius: 16,
-    padding: 18,
-    marginBottom: 14,
+    padding: 16,
+    marginBottom: 12,
     alignItems: "center",
   },
   iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
     justifyContent: "center",
@@ -144,7 +154,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
     marginBottom: 4,
     fontFamily: "System",
@@ -157,7 +167,7 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 12,
   },
   continueButton: {
     width: "100%",
