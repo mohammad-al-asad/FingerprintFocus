@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -93,15 +94,11 @@ export default function TestimonialsScreen() {
         <View style={styles.body}>
           {/* Overlapping Avatars Header */}
           <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.avatarHeader}>
-            <View style={[styles.avatarCircle, { backgroundColor: "#FF2D55", zIndex: 3 }]}>
-              <Text style={styles.avatarInitial}>JR</Text>
-            </View>
-            <View style={[styles.avatarCircle, { backgroundColor: "#007AFF", zIndex: 2, marginLeft: -18 }]}>
-              <Text style={styles.avatarInitial}>MT</Text>
-            </View>
-            <View style={[styles.avatarCircle, { backgroundColor: "#34C759", zIndex: 1, marginLeft: -18 }]}>
-              <Text style={styles.avatarInitial}>EP</Text>
-            </View>
+            <Image
+              source={require("@/assets/images/reviewDP.png")}
+              style={styles.avatarImage}
+              resizeMode="contain"
+            />
           </Animated.View>
 
           {/* Heading Text & Badge */}
@@ -217,6 +214,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 4,
+  },
+  avatarImage: {
+    height: 58,
+    borderRadius: 29,
   },
   avatarInitial: {
     color: "#FFFFFF",
