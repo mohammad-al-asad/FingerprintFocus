@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native build folders (prebuild generates these)
+android/
+ios/
+
+# Kotlin
+.kotlin/
+
+# Metro
+.metro-health-check*
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+
+# Credentials & secrets
+*.pem
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.env*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# AI / Agent configs
+.claude/
+.agents/
+AGENTS.md
+CLAUDE.md
+
+# Documentation (not needed for build)
+README.md
+LICENSE
+
+# Git
+.git/
+.gitignore
